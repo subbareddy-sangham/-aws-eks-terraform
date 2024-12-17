@@ -79,23 +79,27 @@ Jenkins fetches credentials securely from HashiCorp Vault:
 # Post-Execution Verification:
 **1. AWS Console:**
 - Navigate to EKS > Verify the cluster and node group creation.
+  
 **2. CLI Commands:**
 - Test Kubernetes connectivity:
-  
+```bash
 kubectl get nodes
 kubectl get pods --all-namespaces
+  ```  
 
 ### Note:
 The Jenkins pipeline script dynamically updates the kubeconfig for the Jenkins user during pipeline execution, which allows access to the EKS cluster for CI/CD jobs. However, when a user manually logs into the Jenkins server (for example, the Ubuntu user), the kubeconfig must be configured explicitly. This is necessary because it is located in a different directory and is not shared between users.
 
 ### Why This Happens?
+
 ** Jenkins Pipeline Context:**
-The pipeline uses the /var/lib/jenkins/.kube/config file, specifically created for the Jenkins user.
-Kubernetes commands (kubectl) executed by Jenkins are scoped to Jenkins' home directory (/var/lib/jenkins).
+
+- The pipeline uses the /var/lib/jenkins/.kube/config file, specifically created for the Jenkins user.
+- Kubernetes commands (kubectl) executed by Jenkins are scoped to Jenkins' home directory (/var/lib/jenkins).
 
 ** Manual Login Context:**
-When you log in as ubuntu, the system looks for the kubeconfig in the default location for the ubuntu user, which is ~/.kube/config (i.e., /home/ubuntu/.kube/config).
-Since the pipeline kubeconfig is set for the Jenkins user, it is not automatically available for the ubuntu user.
+- When you log in as ubuntu, the system looks for the kubeconfig in the default location for the ubuntu user, which is ~/.kube/config (i.e., /home/ubuntu/.kube/config).
+- Since the pipeline kubeconfig is set for the Jenkins user, it is not automatically available for the ubuntu user.
 
 **3. Terraform State:**
 - Verify Terraform state is stored in the backend or locally.
