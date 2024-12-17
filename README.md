@@ -18,7 +18,7 @@ Effectively and securely managing infrastructure is essential for modern DevOps 
   - EKS Cluster
   - Worker Nodes
 
-4. CI/CD Pipeline:
+**4. CI/CD Pipeline:**
 Jenkins pipeline retrieves secrets from Vault and runs Terraform stages for EKS provisioning.
 
 # Prerequisites:
