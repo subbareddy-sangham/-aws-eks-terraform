@@ -32,6 +32,7 @@ Jenkins pipeline retrieves secrets from Vault and runs Terraform stages for EKS 
 - Jenkins installed and configured with required plugins.
 - Vault credentials (vault-role-id, vault-secret-id, VAULT_URL) configured in Jenkins Credentials Store.
 - Preinstall kubectl on the Jenkins Server:
+  
 ![image](https://github.com/user-attachments/assets/bc7015ed-e622-40dc-b48b-9203b5a73211)
 
 
@@ -92,12 +93,12 @@ The Jenkins pipeline script dynamically updates the kubeconfig for the Jenkins u
 
 #### Why This Happens?
 
-** Jenkins Pipeline Context:**
+**Jenkins Pipeline Context:**
 
 - The pipeline uses the /var/lib/jenkins/.kube/config file, specifically created for the Jenkins user.
 - Kubernetes commands (kubectl) executed by Jenkins are scoped to Jenkins' home directory (/var/lib/jenkins).
 
-** Manual Login Context:**
+**Manual Login Context:**
 - When you log in as ubuntu, the system looks for the kubeconfig in the default location for the ubuntu user, which is ~/.kube/config (i.e., /home/ubuntu/.kube/config).
 - Since the pipeline kubeconfig is set for the Jenkins user, it is not automatically available for the ubuntu user.
 
