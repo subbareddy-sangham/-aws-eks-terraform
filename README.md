@@ -42,7 +42,7 @@ Jenkins pipeline retrieves secrets from Vault and runs Terraform stages for EKS 
   - secret/github → GitHub PAT.
   - AppRole authentication configured (vault-role-id and vault-secret-id).
 
-### Best Practices:
+##### Best Practices:
 **3.1 Automate Credential Renewal:**
 - Since secret_id expires (the default TTL is 24 hours), consider automating its regeneration and updating Jenkins credentials programmatically.
 Use Vault CLI or API scripts to refresh credentials periodically.
