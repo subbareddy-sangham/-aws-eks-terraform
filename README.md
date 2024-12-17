@@ -32,8 +32,10 @@ IAMFullAccess
 Jenkins installed and configured with required plugins.
 Vault credentials (vault-role-id, vault-secret-id, VAULT_URL) configured in Jenkins Credentials Store.
 Preinstall kubectl on the Jenkins Server:
+![image](https://github.com/user-attachments/assets/bc7015ed-e622-40dc-b48b-9203b5a73211)
 
-3. HashiCorp Vault Server:
+
+4. HashiCorp Vault Server:
 Vault configured with secrets:
 aws/terraform-project → AWS credentials.
 secret/github → GitHub PAT.
