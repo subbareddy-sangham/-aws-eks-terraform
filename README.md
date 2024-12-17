@@ -40,8 +40,8 @@ Jenkins pipeline retrieves secrets from Vault and runs Terraform stages for EKS 
   - aws/terraform-project → AWS credentials.
   - secret/github → GitHub PAT.
   - AppRole authentication configured (vault-role-id and vault-secret-id).
-### Best Practices:
 
+### Best Practices:
 3.1 Automate Credential Renewal:
 - Since secret_id expires (the default TTL is 24 hours), consider automating its regeneration and updating Jenkins credentials programmatically.
 Use Vault CLI or API scripts to refresh credentials periodically.
@@ -51,6 +51,51 @@ Use Vault CLI or API scripts to refresh credentials periodically.
 - Use Jenkins Secret Text credentials to avoid plain-text exposure in pipeline logs.
 
 3.3 Test Before Deploying:
-
 - Always validate the new role_id and secret_id using the Vault CLI before updating Jenkins.
 - Please refer to the link below for complete information:
+  https://blog.devops.dev/step-by-step-guide-using-hashicorp-vault-to-secure-aws-credentials-in-jenkins-ci-cd-pipelines-with-6a3971c63580
+
+- Terraform Configurations Linear Process Diagram Outline:
+  ![image](https://github.com/user-attachments/assets/0a4d04f8-f62d-40a1-8e8c-9602b0f34774)
+  ![image](https://github.com/user-attachments/assets/81d3632d-6df3-4949-a896-ae7dead86dec)
+
+# CI/CD Pipeline Execution Workflow
+## Jenkins Pipeline Script Execution
+Jenkins fetches credentials securely from HashiCorp Vault:
+  - Vault AppRole authentication retrieves AWS and GitHub tokens.
+  - Secrets are exported to environment variables (vault_env.sh).
+## Pipeline Stages:
+1. Fetch Credentials from Vault
+2. Checkout Source Code
+3. Install Terraform
+4. Terraform Init: Initializes Terraform backend.
+5. Terraform Plan and Apply: Provisions the VPC, subnets, and EKS cluster.
+6. Update Kubeconfig and Verify:
+   - Dynamically retrieves EKS cluster details using AWS CLI.
+   - Updates kubeconfig for kubectl.
+7. Prompt for Terraform Destroy: Ensures controlled teardown.
+8. Terraform Destroy (Optional): Destroys infrastructure after confirmation.
+
+# Post-Execution Verification:
+**1. AWS Console:**
+- Navigate to EKS > Verify the cluster and node group creation.
+**2. CLI Commands:**
+- Test Kubernetes connectivity:
+  
+kubectl get nodes
+kubectl get pods --all-namespaces
+
+### Note:
+The Jenkins pipeline script dynamically updates the kubeconfig for the Jenkins user during pipeline execution, which allows access to the EKS cluster for CI/CD jobs. However, when a user manually logs into the Jenkins server (for example, the Ubuntu user), the kubeconfig must be configured explicitly. This is necessary because it is located in a different directory and is not shared between users.
+
+### Why This Happens?
+** Jenkins Pipeline Context:**
+The pipeline uses the /var/lib/jenkins/.kube/config file, specifically created for the Jenkins user.
+Kubernetes commands (kubectl) executed by Jenkins are scoped to Jenkins' home directory (/var/lib/jenkins).
+
+** Manual Login Context:**
+When you log in as ubuntu, the system looks for the kubeconfig in the default location for the ubuntu user, which is ~/.kube/config (i.e., /home/ubuntu/.kube/config).
+Since the pipeline kubeconfig is set for the Jenkins user, it is not automatically available for the ubuntu user.
+
+**3. Terraform State:**
+- Verify Terraform state is stored in the backend or locally.
